@@ -41,7 +41,7 @@ networking.hostId = "b41fe6df";
   # Enable the OpenSSH daemon.
  services.openssh.enable = true;
  services.openssh.permitRootLogin = "yes";
-
+ services.memcached.enable = true;
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
@@ -59,5 +59,34 @@ networking.hostId = "b41fe6df";
   #   isNormalUser = true;
   #   uid = 1000;
   # };
-
+  services.nginx = {
+    enable = true;
+    config = ''
+ #     error_log  /var/log/nginx/error.log;
+      events {}
+    http {
+      server {
+ #       access_log /var/log/nginx/access.log;
+	listen 80;
+	root /webroot;
+      }
+    }
+   '';
+  };
+  services.phpfpm.poolConfigs =  { 
+	mypool = ''
+          listen = 127.0.0.1:9000
+          user = nobody
+          pm = dynamic
+          pm.max_children = 75
+          pm.start_servers = 10
+          pm.min_spare_servers = 5
+          pm.max_spare_servers = 20
+          pm.max_requests = 500 
+	'';
+  };
+networking.firewall = {
+  enable = true;
+  allowedTCPPorts = [ 80 443 ];
+};
 }
